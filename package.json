@@ -1,0 +1,11 @@
+{
+  "name": "good-bits",
+  "version": "1.0.0",
+  "description": "examples",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "pjmd",
+  "license": "ISC"
+}
