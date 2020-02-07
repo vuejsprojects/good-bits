@@ -1,6 +1,7 @@
 // Demonstrates:
 // - Object.call
 // - valueOf
+// - arguments
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call
 
@@ -58,3 +59,16 @@ console.log("\nDoes cheese need to be cooked ? response: ", cheese.isToBeCooked(
 const processedFood = new Product('balony', 3);
 console.log("Does ", processedFood.name, " need to be cooked ? response: ",
     processedFood.isToBeCooked()); // output false
+
+
+//
+// Arguments
+//
+const f = function() {
+    let sum = 0;
+    for (let i=0; i < arguments.length; i++) {
+        sum += arguments[i];
+    }
+    return sum;
+}
+console.log(f(1,3,5,7,9)); // output 25
