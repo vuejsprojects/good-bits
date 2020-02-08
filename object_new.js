@@ -25,6 +25,9 @@ let piscine = Object.create(proto);
 const Piscine = function(l, w) {
     this.l = l;
     this.w = w;
+    this.squareMeter = function() {
+        return this.l *0.3 * this.w * 0.3;
+    }
 }
 
 Piscine.prototype.squareFootage = function () {
@@ -33,16 +36,17 @@ Piscine.prototype.squareFootage = function () {
 
 piscine = new Piscine(9, 4.5);
 console.log(piscine.squareFootage()); // output 40.5
+console.log("in m2: ", piscine.squareMeter()); // output 40.5
 
 // reflecting the piscine object
 console.log('piscine properties')
 for (let prop in piscine) {
-    console.log(prop); // l, w, squareFootage, init
+    console.log(prop); // l, w, squareMeter, squareFootage, init
 }
 console.log('piscine properties with Object.getOwnPropertyNames which exclude functions')
 let piscine_props = Object.getOwnPropertyNames(piscine);
 for (let i=0; i < piscine_props.length; i++) {
-    console.log(piscine_props[i]); // l, w
+    console.log(piscine_props[i]); // l, w, squareMeter
 }
 
 piscine.height = 1.20;
@@ -53,16 +57,16 @@ console.log(piscine.getVolume()); // output 48.6
 
 console.log('piscine new properties')
 for (let prop in piscine) {
-    console.log(prop);  // l, w, height, getVolume, squareFootage, init
+    console.log(prop);  // l, w, squareMeter, height, getVolume, squareFootage, init
 }
 console.log('piscine new properties with Object.getOwnPropertyNames which exclude functions')
 piscine_props = Object.getOwnPropertyNames(piscine);
 for (let i=0; i < piscine_props.length; i++) {
-    console.log(piscine_props[i]);   // l, w, height, getVolume
+    console.log(piscine_props[i]);   // l, w, squareMeter, height, getVolume
 }
 
 // list piscine prototype
-console.log('list piscine prototype');
+console.log('list piscine prototype, i.e. what was defined on the Piscine.prototype');
 for (let prop in piscine.__proto__) {
-    console.log(prop); // l, w, squareFootage, init
+    console.log(prop); // squareFootage
 }

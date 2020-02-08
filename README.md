@@ -154,28 +154,169 @@ catch(e) {
 JS allows basic type to be augmented  
 Adding a method to Object.prototype makes the propety available to all object create before or after the addition.  
 
-Ex:
+
+[Using a prototype object](https://github.com/vuejsprojects/good-bits/blob/master/object_prototype.js "Example using prototype object")
 
 ```javascript
-// https://openclassrooms.com/en/courses/3523231-learn-to-code-with-javascript/4379006-use-constructor-functions
-
-[Using a prototype object](https://github.com/vuejsprojects/good-bits/blob/master/object_prototype.js)
-
-const person = {
-    firstName: 'toto',
-    lastName: 'martin'
-}
-// Add a convenient method on Object to cerate object based on some object.
-// Note: we don't add the method on Object.prototype so it is not inherited
-// via the prototype chain by newly created objects
-if (typeof(Object.create != 'function') {
-    Object.create = function(o) {
-        const F = function() {};
-        F.prototype = o;
-        return new F();
+// prototype object
+const proto = {
+    l: 0,
+    w: 0,
+    squareFootage: function () {
+        return this.l * this.w;
+    },
+    init: function(l, w) {
+        this.l = l;
+        this.w = w;
     }
 }
+
+// create a instance
+const piscine = Object.create(proto);
+piscine.init(9, 4.5);
+// add a method to the protype. It should appear in the instance
+proto.getSpec = function() {
+    return "Specs: Length=" + this.l + " width=" + this.w + ' height:' + this.height;
+}
+console.log(piscine.getSpec()); // output Length=9 width=4.5 height:1.2
 ```
+
+[Using a function constructor and keyword new](https://github.com/vuejsprojects/good-bits/blob/master/object_new.js "Example using function constructor")
+
+```javascript
+// Convention: first character on a function constructor is uppercase
+const Piscine = function(l, w) {
+    this.l = l;
+    this.w = w;
+    this.squareMeter = function() {
+        return this.l *0.3 * this.w * 0.3;
+    }
+}
+
+Piscine.prototype.squareFootage = function () {
+    return this.l * this.w;
+}
+// the init function is actually the constructor which is a property of Object.prototype
+// and points to the object itself
+piscine = new Piscine(9, 4.5);
+
+```
+
+With a function constructor no need to call an init function to initialize the object.
+
+One could add a method to Function to add new methods to any object.
+
+```javascript
+Function.prototype.method = function(method_name, func) {
+    if (!this.prototype[method_name]) {
+        this.prototype[method_name] = func;
+        return this;
+    }
+}
+
+Number.method('toInteger', function() {
+    return Math[this < 0 ? 'ceil' : 'floor'](this);
+});
+((-10/3)).toInteger(); // output -3
+```
+
+### Scope
+
+JavaScript doesn't have __block scope__ it only has __function scope__.
+
+### Best Practices
+
+It is better to define all variables at the beginning of functions unlike other language where it best to declare them at the point they are used.
+
+### Closure
+It a function or object define with a context, the context being the parameters and variable of the function the create them.
+
+```javascript
+const closure = (function(conter_name) {
+    let var1 = 0;
+    const obj = {
+        display: function() {
+            return conter_name + ' = ' + var1;
+        },
+        increment: function(inc) {
+            return var1 += inc;
+        }
+    }
+    return obj;
+})('Mighty counter');
+
+console.log(closure.display()); // Mighty counter = 0
+closure.increment(4);
+console.log(closure.display()); // Mighty counter = 4
+closure.increment(3);
+console.log(closure.display()); // Mighty counter = 7
+```
+
+### Cascade
+It is a function method that returns __this__ so calls can be chain.
+
+### Currying
+
+It is to transform a function that takes arguments into function taking just one argument and returning a function taking the next argument and returning a function and so on until there is no argument left, the last having all the argument to perform the operation.
+
+ ```javascript
+var volume = function(h,l,w) {
+    return h * l * w;
+}
+
+var vol = function(h) {
+    return function(l) {
+        return function(w) {
+            return h * l * w;
+        }
+    }
+}
+
+print("volume(2, 3, 4) === vol(2)(3)(4)")
+print(volume(2, 3, 4), " === ", vol(2)(3)(4)) // true
+// Benefit is reuse of intermediate functions
+vol_h_3 = vol(3);
+// Knowing all my cubes have height of 3 I can caculate the volume of cubes
+// for any length and width
+const l = 4, w = 5;
+print("Benefit: ", vol_h_3(l)(w)); // ouput 60
+ ```
+
+
+## Inheritance
+
+### pseudoclassical
+
+It uses the __new__ keyword on a function Constructor.  
+pseudoclassical drawback:
+* all properties are public
+* no access to super method
+
+```javascript
+const Person = function(name, age) {
+    this.name = name;
+    this.age = age;
+}
+Prerson.prototype.getDetails() {
+    return "Name: " + this.name + " Age: " + this.age;
+}
+
+const person = new Person('toto', 10);
+
+const Employee = function(role) {
+    this.role = role;
+}
+
+Employee.prototype = new Person();
+Employee.prototype.getRole = function() {
+    return "Role: " + this.role;
+}
+const employee = new Employee("Chief");
+
+```
+
+### prototypal
+It uses the Object.create (some_object) some_object could be an object litteral
 
 
 
