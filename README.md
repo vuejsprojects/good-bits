@@ -66,9 +66,13 @@ See *https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Ob
 
 ### General
 
-Ojects litterals i.e. {}, are linked to Object.prototype  
-Function objects are likend to Function.prototype  
-__prototype__ is an object with several properties, on of them is constructor which points back to the oject itself.  
+Ojects litterals i.e. {}, are linked to __Object.prototype__  
+Function objects are likend to __Function.prototype__  
+
+Every JavaScript object has an internal property called __prototype__ . This is a link (known as reference ) to another object. When trying to access a property that does not exist in an object, JavaScript tries to find this property in the prototype (or more precisely the prototype chain) of this object.
+
+__prototype__ is an object with several properties, on of them is __constructor__ which points back to the oject itself.  
+__constructor__ In Javascript, the equivalent of the built-in init __Python__ function is called a constructor function, and it is invoked by using the special Javascript keyword __new__
 
 A function is a first class object, it can be passed or returned, have properties, assigned.  
 
@@ -144,6 +148,35 @@ catch(e) {
 
 }
 ```
+
+### Augmenting types
+
+JS allows basic type to be augmented  
+Adding a method to Object.prototype makes the propety available to all object create before or after the addition.  
+
+Ex:
+
+```javascript
+// https://openclassrooms.com/en/courses/3523231-learn-to-code-with-javascript/4379006-use-constructor-functions
+
+[Using a prototype object](https://github.com/vuejsprojects/good-bits/blob/master/object_prototype.js)
+
+const person = {
+    firstName: 'toto',
+    lastName: 'martin'
+}
+// Add a convenient method on Object to cerate object based on some object.
+// Note: we don't add the method on Object.prototype so it is not inherited
+// via the prototype chain by newly created objects
+if (typeof(Object.create != 'function') {
+    Object.create = function(o) {
+        const F = function() {};
+        F.prototype = o;
+        return new F();
+    }
+}
+```
+
 
 
 ## Note
