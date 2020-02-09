@@ -154,6 +154,21 @@ catch(e) {
 JS allows basic type to be augmented  
 Adding a method to Object.prototype makes the propety available to all object create before or after the addition.  
 
+__Note:__
+
+Everything has prototype but only functions have a property called prototype.  
+Object instances have a protoype property called __proto__.
+Eventually, down the chain, a __proto__ will point to Object.prototype as everything is object.  
+ref: <http://dmitrysoshnikov.com/ecmascript/javascript-the-core/>
+
+*Note:  
+If Javascript doesn't find a property directly on the object, it goes down the property chain to find it. If it is not there it returns __undefined__*
+
+```javascript
+const Foo = function(x){};
+( new Foo ).__proto__ === Foo.prototype;  
+( new Foo ).prototype === undefined;
+```
 
 [Using a prototype object](https://github.com/vuejsprojects/good-bits/blob/master/object_prototype.js "Example using prototype object")
 
@@ -171,7 +186,7 @@ const proto = {
     }
 }
 
-// create a instance
+// create an object whose prototype is proto
 const piscine = Object.create(proto);
 piscine.init(9, 4.5);
 // add a method to the protype. It should appear in the instance
@@ -179,6 +194,11 @@ proto.getSpec = function() {
     return "Specs: Length=" + this.l + " width=" + this.w + ' height:' + this.height;
 }
 console.log(piscine.getSpec()); // output Length=9 width=4.5 height:1.2
+// add a method to the protoype proto thru the instance
+piscine.__proto__.getType = function() {
+    return "salt";
+}
+console.log(piscine.getType()); // output salt
 ```
 
 [Using a function constructor and keyword new](https://github.com/vuejsprojects/good-bits/blob/master/object_new.js "Example using function constructor")
@@ -289,38 +309,258 @@ print("Benefit: ", vol_h_3(l)(w)); // ouput 60
 
 It uses the __new__ keyword on a function Constructor.  
 pseudoclassical drawback:
+
 * all properties are public
 * no access to super method
 
 ```javascript
+// pseudoclass
 const Person = function(name, age) {
     this.name = name;
     this.age = age;
 }
-Prerson.prototype.getDetails() {
+Person.prototype.getDetails = function() {
     return "Name: " + this.name + " Age: " + this.age;
 }
-
+Person.prototype.whatIs = function() {
+    return "Human?";
+}
 const person = new Person('toto', 10);
 
-const Employee = function(role) {
+// pseudo class
+const Employee = function(name, age, role) {
+    // name, age, role are direct property of employee not Person
     this.role = role;
+    // we would rather call the super method to initialize name, age
+    this.name = name;
+    this.age = age;
 }
 
 Employee.prototype = new Person();
 Employee.prototype.getRole = function() {
     return "Role: " + this.role;
 }
-const employee = new Employee("Chief");
+Employee.prototype.getDetails = function() {
+    // Again we would rather call the method on super class to 
+    // dsipay the details.
+    return "Role: " + this.role +" "+"Name: " + this.name + " Age: " + this.age;
+}
+
+const employee = new Employee('chipie', 1, "Chief");
+console.log(employee.getDetails()); // ouput undefined, undefined
+console.log(employee.getRole()); //output chief
+console.log(employee.whatIs()); //output Human?
 
 ```
 
 ### prototypal
+
+Simpler than psudoclassical.  
 It uses the Object.create (some_object) some_object could be an object litteral
 
+```javascript
+// simple object
+const aPerson = {
+    name: 'toto',
+    age: 10,
+    getDetails: function() {
+        return "Name: " + this.name + " Age: " + this.age;
+    },
+    whatIs: function() {
+        return "Human?";
+    }
+}
+
+// new instance chipie inherits from aPerson object
+// chipie's prototype is aPerson
+const chipie = Object.create(aPerson);
+console.log(chipie.getDetails()); // ouput Name: toto Age: 10
+console.log(chipie.whatIs()); //output Human?
+
+// here we are not modifying the prototype aPerson but adding to chipie
+chipie.age = 1;
+chipie.name = 'chipie';
+chipie.role = 'pet';
+chipie.getRole = function() {
+    return this.role;
+}
+// It is possible to call a super method directly
+chipie.getFullDetails = function() {
+    return "Role: " + this.role + " " + this.getDetails(); 
+}
+
+console.log(chipie.getDetails()); // ouput Name: chipie Age: 1
+console.log(chipie.getRole()); //output pet
+console.log(chipie.whatIs()); //output Human?
+console.log(chipie.getFullDetails()); // ouput Role: pet Name: toto Age: 10
+
+// It is possible to call a super method thru __proto__
+// But the result is the object prototype's data
+chipie.getDetails = function() {
+    return "Role: " + this.role + " " + this.__proto__.getDetails(); 
+}
+console.log(chipie.getDetails()); // ouput Role: pet Name: toto Age: 10
+```
+
+### Functional
+
+* allows privacy
+* Better encapsulation (private proerties and methods)
+* access to super methods
+
+```javascript
+// simple function
+const makePerson = function(specObject) {
+    
+    const obj = {};
+
+    // we could copy specObject into a private object of variables
+
+    // private begins
+    let coef = 0;
+    const calculateRealAge = function() {
+        return (calculateCoef() *  specObject.age);
+    }
+    const calculateCoef = function() {
+        if (specObject.role && specObject.role === 'pet') {
+            coef = 0.5;
+        }
+        else {
+            coef = 1;
+        }
+        return coef;
+    }
+    const getCoef = function() {
+        return coef;
+    }
+    // private ends
+
+    obj.getDetails = function() {
+        return "Name: " + specObject.name + " Age: " + calculateRealAge() + 
+        ' coef: ' +coef;
+    };
+    obj.whatIs = function() {
+        return "Human?";
+    };
+    return obj;
+}
+
+// new instance of makePerson
+const aPerson = makePerson({
+    name: 'toto',
+    age: 10
+});
+console.log(aPerson.getDetails()); // ouput Name: toto Age: 10 coef: 1
+console.log(aPerson.whatIs()); //output Human?
+
+// inherits from makePerson and add functionalities
+const makeChipie = function(spec) {
+    const obj = makePerson(spec);
+
+    // we augment the instance
+    obj.getRole = function() {
+        return spec.role;
+    };
+    // we call super method getDetails
+    obj.getFullDetails = function() {
+        return "Role: " + this.getRole() + " " + this.getDetails(); 
+    }
+    return obj;
+};
+
+const chipie =  makeChipie({
+    name: 'chipie',
+    age: 1,
+    role: "pet"
+});
 
 
-## Note
+console.log(chipie.getDetails()); // Name: chipie Age: 0.5 coef: 0.5
+console.log(chipie.getRole()); //output pet
+console.log(chipie.whatIs()); //output Human?
+console.log(chipie.getFullDetails()); // ouput Role: pet Name: chipie Age: 0.5 coef: 0.5
+```
+
+## Arrays
+
+They are objects made of properties, i.e. array like objects.
+Their properties is a set of integers starting from 0.
+The first element has property name 0
+The second element has property name 1
+And so on
+
+ex:
+
+```javascript
+const ar = ['one`, 'two', 'three'];
+// equivalent to
+const eq_ar = {
+    '0': 'one',
+    '1': 'two',
+    '2': 'three',
+};
+// this is why
+for (let it in ar) {
+    console.log(it); // output '0' '1' '2' + possible other prepoerties set on the array and no order guarantee
+}
+// and
+for (let i=0; i < ar.length; i++) {
+    console.log(ar[i]); // output 'one`, 'two', 'three'
+}
+```
+
+Array has a length property which is the highest property name + 1
+length is not the number of items in the array
+
+```javascript
+const ar_high[1000] = 'stuff'; // 1000 is auto converted to a string '1000'
+console.log(ar_high.length); // output 1001
+```
+
+If an array has 10 items and it length is set to 3 all the items beyond 3 are discarded.  
+
+To add a item to an array:
+ar[ar.length] = 'item';
+or
+ar.puush('item');
+
+One can delete a item but it leaves a hole in the array. Use splice which compresses the array:
+
+```javascript
+del ar[2]  
+// To remove the hole, use splice which compresses the array:  
+const rank_to_delete = 2;  
+const num_of_items_to_delete = 1;
+ar.splice(rank_to_delete, num_of_items_to_delete);  
+```
+
+Type of an array is object, To make sure it is an array, check it's cconstructor
+
+```javascript
+cont ar [1,2,3,4]
+console.log(type of ar); // outpot object
+console.log(ar.constructor === Array); // output true
+```
+
+## RegExp
+
+Methods working with regular expressions are:
+
+* regexp.exec
+* regexp.test
+* String.match
+* String.replace
+* String.search
+* String.split
+
+A litteral regex is surrounded with /the regular exp/  
+A RegExp object world be:  
+const regex = new RegExp("regular expression");  
+Within "regular expression" / and \ and " need to be escaped
+
+
+
+## Reminder
 
 * Variables and function definition are hosited, meaning a variable can be defined after it used and when defined JS put them back at the top of the file.
 * In JS if __;__ is missing will put one at the and of a statement. This dangerous because sometimes it makes wrong assumption and put them at the wrong place.  
