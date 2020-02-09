@@ -95,7 +95,7 @@ Inner function have access to parent variables and can even modify them unlike P
 ```javascript
 const f = function() {
     let v1 = 0;
-    innerf = function() {
+    const innerf = function() {
         v1 += 1;
     }
 }
@@ -242,7 +242,25 @@ Number.method('toInteger', function() {
 
 ### Scope
 
-JavaScript doesn't have __block scope__ it only has __function scope__.
+JavaScript doesn't have __block scope__ it only has __function scope__.  
+
+__In ES6, const and let__ keywords allow developers to declare variables in the block scope, which means those variables exist only within the corresponding block.
+
+```javascript
+function foo(){
+    if(true){
+        var fruit1 = 'apple';        //exist in function scope it gets hoisted
+        const fruit2 = 'banana';     //exist in block scope
+        let fruit3 = 'strawberry';   //exist in block scope
+
+    }
+    console.log(fruit1); // output apple
+    console.log(fruit2); // output ReferenceError
+    console.log(fruit3);  // output ReferenceError (doesn't get there)
+}
+
+foo();
+```
 
 ### Best Practices
 
@@ -250,6 +268,8 @@ It is better to define all variables at the beginning of functions unlike other 
 
 ### Closure
 It a function or object define with a context, the context being the parameters and variable of the function the create them.
+
+[Example](https://github.com/vuejsprojects/good-bits/blob/master/closure.js "Example demonstrating closures")
 
 ```javascript
 const closure = (function(conter_name) {
@@ -272,8 +292,32 @@ closure.increment(3);
 console.log(closure.display()); // Mighty counter = 7
 ```
 
-### Cascade
-It is a function method that returns __this__ so calls can be chain.
+### [Cascade](https://github.com/vuejsprojects/good-bits/blob/master/cascade.js "Example demonstrating cascades")
+
+It is a function method that returns __this__ so calls can be chained.
+
+```javascript
+const ob  = {
+    method1: function(x) {
+        this.x = x;
+        const that = this;
+        const exp = function(n) {
+            that.x = that.x * Math.pow(10, n);
+        }
+        exp(3);
+        return this;
+    },
+    method2: function(y) {
+        this.x += y;
+        return this;
+    },
+    print: function() {
+        console.log(this.x);
+        return this;
+    }
+}
+ob.method1(5).method2(3).print();  // output 5008
+```
 
 ### Currying
 
@@ -305,7 +349,7 @@ print("Benefit: ", vol_h_3(l)(w)); // ouput 60
 
 ## Inheritance
 
-### pseudoclassical
+### [pseudoclassical](https://github.com/vuejsprojects/good-bits/blob/master/inheritance_pseudoclassical.js "Example demonstrating pseudoclassical inheritance")
 
 It uses the __new__ keyword on a function Constructor.  
 pseudoclassical drawback:
@@ -353,7 +397,7 @@ console.log(employee.whatIs()); //output Human?
 
 ```
 
-### prototypal
+### [prototypal](https://github.com/vuejsprojects/good-bits/blob/master/inheritance_prototypal.js "Example demonstrating prototypal inheritance")
 
 Simpler than psudoclassical.  
 It uses the Object.create (some_object) some_object could be an object litteral
@@ -402,7 +446,7 @@ chipie.getDetails = function() {
 console.log(chipie.getDetails()); // ouput Role: pet Name: toto Age: 10
 ```
 
-### Functional
+### [Functional](https://github.com/vuejsprojects/good-bits/blob/master/inheritance_functional.js "Example demonstrating Functional inheritance")
 
 * allows privacy
 * Better encapsulation (private proerties and methods)
@@ -481,17 +525,13 @@ console.log(chipie.whatIs()); //output Human?
 console.log(chipie.getFullDetails()); // ouput Role: pet Name: chipie Age: 0.5 coef: 0.5
 ```
 
-## Arrays
+## [Arrays](https://github.com/vuejsprojects/good-bits/blob/master/arrays.js "Example about Array")
 
-They are objects made of properties, i.e. array like objects.
-Their properties is a set of integers starting from 0.
-The first element has property name 0
-The second element has property name 1
-And so on
-
-[Demonstrating Array](https://github.com/vuejsprojects/good-bits/blob/master/arrays.js "Example about Array")
-
-ex:
+They are objects made of properties, i.e. array like objects.  
+Their properties is a set of integers starting from 0.  
+The first element has property name 0  
+The second element has property name 1  
+And so on  
 
 ```javascript
 const ar = ['one', 'two', 'three'];
@@ -568,8 +608,10 @@ Within "regular expression" / and \ and " need to be escaped
 
 ## Reminder
 
-* Variables and function definition are hosited, meaning a variable can be defined after it used and when defined JS put them back at the top of the file.
-* In JS if __;__ is missing will put one at the and of a statement. This dangerous because sometimes it makes wrong assumption and put them at the wrong place.  
+* Variable and function definitions are hosited, meaning a variable can be defined after it used and when defined JS put them back at the top of the file.  
+__See this very good article__ <https://blog.bitsrc.io/hoisting-in-modern-javascript-let-const-and-var-b290405adfda>
+
+* if a __;__ is missing JavaScript will put one at the and of the statement. This is dangerous because sometimes it makes wrong assumptions and put them at the wrong place.  
 Ex:
 
 ```
@@ -579,7 +621,7 @@ return // JS will put ; here intead of after }
 }
 ```
 
-* Unlike Python in JS a variable is define whit a var, const or let whereas in Python a vairable is defined when it is first used.
+* Unlike Python in JS a variable is define whith a var, const or let whereas in Python a vairable is defined when it is first used.
 
 * __var__ is more or less deprecated used __let__ if the variable is supposed to mutated if not __const__. if any is omitted the variable is global.
 
