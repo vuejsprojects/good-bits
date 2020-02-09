@@ -6,6 +6,9 @@ const eq_ar = {
     '1': 'two',
     '2': 'three',
 };
+for (let i=0; i < ar.length; i++) {
+    console.log(ar[i] === eq_ar[i]); // output true not guarantee because of order and possibly added properties
+}
 
 for (let it in ar) {
     console.log(it); // output '0' '1' '2' + possible other prepoerties set on the array and no order guarantee
