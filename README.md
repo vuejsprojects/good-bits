@@ -489,10 +489,12 @@ The first element has property name 0
 The second element has property name 1
 And so on
 
+[Demonstrating Array](https://github.com/vuejsprojects/good-bits/blob/master/arrays.js "Example about Array")
+
 ex:
 
 ```javascript
-const ar = ['one`, 'two', 'three'];
+const ar = ['one', 'two', 'three'];
 // equivalent to
 const eq_ar = {
     '0': 'one',
@@ -513,7 +515,8 @@ Array has a length property which is the highest property name + 1
 length is not the number of items in the array
 
 ```javascript
-const ar_high[1000] = 'stuff'; // 1000 is auto converted to a string '1000'
+const ar_high = [];
+ar_high[1000] = 'stuff'; // 1000 is auto converted to a string '1000'
 console.log(ar_high.length); // output 1001
 ```
 
@@ -527,18 +530,21 @@ ar.puush('item');
 One can delete a item but it leaves a hole in the array. Use splice which compresses the array:
 
 ```javascript
-del ar[2]  
+ar = ['one', 'two', 'three', 'quatre'];
+delete(ar[2]);
+console.log(ar); // output ["one", "two", …, "quatre"] 
 // To remove the hole, use splice which compresses the array:  
 const rank_to_delete = 2;  
 const num_of_items_to_delete = 1;
 ar.splice(rank_to_delete, num_of_items_to_delete);  
+console.log(ar); // output ["one", …, "quatre"]
 ```
 
 Type of an array is object, To make sure it is an array, check it's cconstructor
 
 ```javascript
 cont ar [1,2,3,4]
-console.log(type of ar); // outpot object
+console.log(type of ar); // output object
 console.log(ar.constructor === Array); // output true
 ```
 
