@@ -106,7 +106,7 @@ const f = function() {
 Besides it's parameters a function receives 2 parameters: this and arguments.  
 This depends on the invocation patern of the function:  
 
-* Invoked a mere function, this points to the global object.
+* Invoked a mere function, __this__ points to the global object.
 * Invoked as a method, i.e. property of an object, this points to the object. So becareful when a method calls an inner function  
 
 ```javascript
@@ -121,7 +121,7 @@ This depends on the invocation patern of the function:
 
 * Invoked as a consrtuctor with keyword new, (by convetion the first letter o the function is uppercase) this points to the object instance. Construtor function are not the recommended way to create objects  
 * Invoked with apply, 2 parameters are pass to the function __(that, arguments)__. __That__ if not null points to the __this__ of the object the function should work on, __arguments__ is a speudo array containing the parameters of the function. If __arguments__ contains fewer arguments that the function parameters, the remaining parameters are set to null, if it contains more arguments they are just ignored. There is no error or type checking.  
-Since all functions receive __arguments__ one could write a function acception any number of parameters  
+Since all functions receive __arguments__ one could write a function accepting any number of parameters  
 
 ```javascript
 const f = function() {
